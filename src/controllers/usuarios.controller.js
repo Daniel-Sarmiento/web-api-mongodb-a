@@ -30,7 +30,7 @@ const create = async (req, res) => {
             message: "usuario creado exitosamente!"
         });
     } catch (error) {
-        return res.status(error.code).json({
+        return res.status(500).json({
             message: "falló al crear el usuario!",
             error: error.message
         });
