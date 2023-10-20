@@ -61,6 +61,66 @@ const getById = async (req, res) => {
     }
 }
 
+// /usuarios/:id
+const updateParcial = async (req, res) => {
+    try {
+        const usuarioId = req.params.id;
+        const datosActualizar = {
+            ...req.body,
+            updated_at: new Date()
+        }
+
+        const usuarioActualizado = await usuarioModel.findByIdAndUpdate(usuarioId, datosActualizar);
+        
+        if (!usuarioActualizado) {
+            return res.status(404).json({
+                message: "usuario no encontrado"
+            });
+        }
+
+        return res.status(200).json({
+            message: "usuario actualizado exitosamente"
+        })
+        
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "ocurrió un error al editar el usuario",
+            error: error.message
+        });
+    }
+}
+
+// /usuarios/:id
+const updateCompleto = async (req, res) => {
+    try {
+        const usuarioId = req.params.id;
+        const datosActualizar = {
+            nombre: req.body.nombre || null,
+            email: req.body.email || null,
+            password: req.body.password || null,
+            updated_at: new Date()
+        }
+
+        const usuarioActualizado = await usuarioModel.findByIdAndUpdate(usuarioId, datosActualizar);
+        
+        if (!usuarioActualizado) {
+            return res.status(404).json({
+                message: "usuario no encontrado"
+            });
+        }
+
+        return res.status(200).json({
+            message: "usuario actualizado exitosamente"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "ocurrió un error al editar el usuario",
+            error: error.message
+        });
+    }
+}
+
 const create = async (req, res) => {
     try {
         let usuario = new usuarioModel({
@@ -132,5 +192,7 @@ module.exports = {
     index,
     getById,
     create,
-    delete: deleteLogico
+    delete: deleteLogico,
+    updateParcial,
+    updateCompleto
 } 
