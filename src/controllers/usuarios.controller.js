@@ -16,6 +16,31 @@ const index = async (req, res) => {
     }
 };
 
+// usuario/:id
+const getById = async (req, res) => {
+    try {
+        const usuarioId = req.params.id;
+        const usuario = await usuarioModel.findById(usuarioId);
+
+        if (!usuario) {
+            return res.status(404).json({
+                message: "usuario no encontrado"
+            });
+        }
+
+        return res.status(200).json({
+            message: "usuario obtenido exitosamente",
+            usuario
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "ocurrió un error al obtener el usuario",
+            error: error.message
+        });
+    }
+}
+
 const create = async (req, res) => {
     try {
         let usuario = new usuarioModel({
@@ -58,8 +83,7 @@ const deleteLogico = async (req, res) => {
             error: error.message
         })
     }
-}
-
+};
 
 const deleteFisico = async (req, res) => {
     try {
@@ -82,10 +106,11 @@ const deleteFisico = async (req, res) => {
             error: error.message
         })
     }
-}
+};
 
 module.exports = {
     index,
+    getById,
     create,
     delete: deleteLogico
 } 
