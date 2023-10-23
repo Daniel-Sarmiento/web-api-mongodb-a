@@ -1,4 +1,6 @@
 const usuarioModel = require('../models/usuario.model');
+const bcrypt = require('bcrypt');
+const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
 
 // /usuarios?page=1&limit=2
 // server side pagination <- / client side pagination
@@ -6,6 +8,8 @@ const index = async (req, res) => {
     try {
         const {page, limit} = req.query;
         const skip = (page - 1) * limit;
+
+        const usuario = req.usuario;
         
         const usuarios = await usuarioModel.find({deleted: false}).skip(skip).limit(limit);
 
@@ -126,7 +130,7 @@ const create = async (req, res) => {
         let usuario = new usuarioModel({
             nombre: req.body.nombre,
             email: req.body.email,
-            password: req.body.password
+            password: bcrypt.hashSync(req.body.password, saltosBcrypt)
         });
     
         await usuario.save();
