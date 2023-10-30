@@ -1,6 +1,8 @@
 const usuarioModel = require('../models/usuario.model');
 const bcrypt = require('bcrypt');
 const saltosBcrypt = parseInt(process.env.SALTOS_BCRYPT);
+const path = require('path');
+const fs = require('fs');
 
 // /usuarios?page=1&limit=2
 // server side pagination <- / client side pagination
@@ -125,6 +127,39 @@ const updateCompleto = async (req, res) => {
     }
 }
 
+const updateImagenPerfil = async (req, res) => {
+    try {
+        const {b64, extension} = req.body;
+        const idUsuario = req.params.id;
+        const imagen = Buffer.from(b64, 'base64');
+        const nombreImagen = `${idUsuario}${Date.now()}.${extension}`;
+
+        const usuarioEncontrado = await usuarioModel.findById(idUsuario);
+
+        if (!usuarioEncontrado) {
+            return res.status(404).json({
+                message: "usuario no encontrado"
+            });
+        }
+
+        const uploadPath = path.join(__dirname, '../../uploads', nombreImagen);
+        fs.writeFileSync(uploadPath, imagen)
+
+        usuarioEncontrado.imagenPerfil = nombreImagen;
+        await usuarioEncontrado.save();
+
+        return res.status(200).json({
+            message: "se subió la imagen correctamente"
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "ocurrió un error al actualizar imagen de perfil",
+            error: error.message
+        });
+    }
+}
+
 const create = async (req, res) => {
     try {
         let usuario = new usuarioModel({
@@ -198,5 +233,6 @@ module.exports = {
     create,
     delete: deleteLogico,
     updateParcial,
-    updateCompleto
+    updateCompleto,
+    updateImagenPerfil
 } 
